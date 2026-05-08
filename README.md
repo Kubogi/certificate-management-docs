@@ -1,6 +1,6 @@
 # Certificate Management System - Documentation
 
-A certificate management system for an educational institution. The system tracks student records and physical certificates issued to graduating students from partner training units.
+A certificate management system for an educational institution. The system tracks student records and physical certificates issued to graduating students from partner training units. The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy.
 
 **This repository contains documentation only. The codebase is closed source.**
 
@@ -10,17 +10,6 @@ Full write-up on building this as a solo Year 1 student:
 ## System Architecture
 
 This project is architected to separate public-facing verification from internal administrative workflows. The full technical breakdown can be found in [architecture.md](architecture.md).
-
-```text
-Public Users ──► Vue SPA (/lookup)
-                         │
-Admin Staff ──► Vue SPA (/admin/*)
-                         │
-                         ▼
-                  Express 5 API
-                         ▼
-                     MongoDB
-```
 
 ### Conceptual Overview
 The application is a small two-faced certificate-management system:
@@ -33,6 +22,39 @@ The application is a small two-faced certificate-management system:
 It is a single-tenant, single-process system. There are no background workers,
 no message queues, no caches, no search indexes, no microservices. Every
 operation is request-driven and synchronous.
+
+
+```text
+Public Users ──► Vue SPA (/lookup)
+                         │
+Admin Staff ──► Vue SPA (/admin/*)
+                         │
+                         ▼
+                  Express 5 API
+                         ▼
+                     MongoDB
+```
+
+## Tech Stack
+
+### Frontend
+- Vue 3
+- Vue Router
+- Axios
+- Vite
+
+### Backend
+- Node.js
+- Express 5
+- MongoDB
+- Mongoose 8
+- JWT authentication
+
+### Deployment / Infrastructure
+- Private VPS hosting
+- Nginx reverse proxy
+- PM2 process management
+- MongoDB (self-hosted)
 
 ## Environment
 
