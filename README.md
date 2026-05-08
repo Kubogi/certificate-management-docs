@@ -2,7 +2,9 @@
 
 A certificate management system for educational institutions that tracks students, graduation certificates, issuing schools, and verification records. 
 
-The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy. The system is currently deployed and used in production by a partner institution.
+The platform was developed to improve student access to certificate records for partner institutions. Previously, students had to retrieve or verify records directly through the institution’s administrative office. The online lookup system allows certificate information to be accessed instantly and remotely.
+
+The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy. The system is currently deployed and used in production by 25+ educational institutions.
 
 **This repository contains documentation only. The codebase is closed source.**
 
@@ -117,9 +119,8 @@ A few things will surprise a new contributor; each is called out in the relevant
 1. **Empty `models/Transaction.js`** — endpoints under `/api/admin/transactions/*` operate on the `Action` model, not `Transaction`. The empty file is dead code.
 2. **`backend/config.json`** — references a hardcoded Windows path. Not loaded by the server. Dead config.
 3. **No `Bearer ` on requests, but `Bearer ` on refresh response** — see [backend/auth.md](backend/auth.md). The frontend handles the asymmetry by stripping `Bearer ` before storing the refreshed token.
-4. **`VITE_DEBUG=0` means production-style same-origin proxy**, not "debug off." The flag is misnamed.
-5. **Two parallel APIs for inventory and transactions** — the legacy `POST /insert_inventory` / `POST /insert_action` (bulk, accepts arrays) and the REST-style `POST/PUT/DELETE /inventory/:id` / `/transactions/:id` (single records) coexist. Both are used by the frontend.
-6. **`filter_inventory` and `filter_actions` field lists don't match their schemas** — see [api/endpoints/inventory.md](api/endpoints/inventory.md) and [api/endpoints/transactions.md](api/endpoints/transactions.md). These endpoints look like leftovers from an earlier data model.
+4. **Two parallel APIs for inventory and transactions** — the legacy `POST /insert_inventory` / `POST /insert_action` (bulk, accepts arrays) and the REST-style `POST/PUT/DELETE /inventory/:id` / `/transactions/:id` (single records) coexist. Both are used by the frontend.
+5. **`filter_inventory` and `filter_actions` field lists don't match their schemas** — see [api/endpoints/inventory.md](api/endpoints/inventory.md) and [api/endpoints/transactions.md](api/endpoints/transactions.md). These endpoints look like leftovers from an earlier data model.
 
 ## Status
 
