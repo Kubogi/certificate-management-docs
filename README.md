@@ -1,0 +1,130 @@
+# Certificate Management System - Documentation
+
+A certificate management system for an educational institution. The system tracks student records and physical certificates issued to graduating students from partner training units.
+
+**This repository contains documentation only. The codebase is closed source.**
+
+Full write-up on building this as a solo Year 1 student:
+[Does vibe coding actually work?](https://kubogi.github.io/2025/12/28/vibe-coding.html)
+
+The application has two faces:
+
+- **Public lookup** (`/lookup`) — anyone can search a certificate by school + student ID, or by full name + date of birth. No login required.
+- **Admin dashboard** (`/admin/*`) — staff manage students, schools, certificate inventory, and users. Login required, with three roles (`admin`, `manager`, `viewer`).
+
+## Repo layout
+
+```
+student-lookup/
+├── backend/         # Express 5 + MongoDB (Mongoose) API server
+├── frontend/        # Vue 3 + Vue Router + PrimeVue SPA (Sakai template)
+├── docs/            # This documentation tree
+├── .env             # Shared env config (loaded by both server + register/dedupe scripts)
+└── example.env      # Template for .env
+```
+
+The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. There is also a top-level `package.json` that holds a duplicate set of backend dependencies; it is unused by the running server but installed by mistake. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
+
+## Quickstart
+
+### Prerequisites
+
+- Node.js (no version is pinned; tested with 18+)
+- A MongoDB connection string
+
+### First-time setup
+
+```sh
+# Backend deps
+cd backend
+npm install
+
+# Frontend deps
+cd ../frontend
+npm install
+
+# Configure environment
+cd ..
+cp example.env .env
+# Edit .env — see "Environment" below
+```
+
+### Run in development
+
+Two terminals:
+
+```sh
+# Terminal 1 — API server (port 5005 by default)
+node backend/server.js
+
+# Terminal 2 — Vite dev server (port 5173 by default)
+npm --prefix frontend run dev
+```
+
+Open http://localhost:5173/lookup for the public page or http://localhost:5173/auth/login for admin.
+
+### Build for production
+
+```sh
+npm --prefix frontend run build   # → frontend/dist/
+node backend/server.js            # serve the API
+```
+
+The frontend is deployed to Vercel — see [frontend/vercel.json](../frontend/vercel.json), which rewrites all paths to `index.html` so client-side routing works on hard refresh. There is no Dockerfile, no CI, and no test suite.
+
+### Create the first admin user
+
+There is no self-serve registration. Use the CLI script:
+
+```sh
+node backend/register.js <username> <password> admin
+```
+
+See [backend/scripts.md](backend/scripts.md) for details.
+
+## Environment
+
+All env vars live in a single `.env` at the repo root. `backend/server.js` loads it via `dotenv.config({ path: '../.env' })`.
+
+| Variable | Used by | Purpose |
+|---|---|---|
+| `URI` | backend | MongoDB connection string |
+| `CORS_ORIGIN` | backend | Allowed CORS origin (e.g. `http://localhost:5173`). Defaults to `*`. |
+| `JWT_SECRET` | backend | Secret for signing/verifying JWTs. Must be set; no default. |
+| `PORT` | backend | Server port (defaults to whatever you set; common: `5005`). |
+| `VITE_DEBUG` | frontend (build-time) | `0` ⇒ axios uses same-origin (empty base URL); any other value ⇒ uses `VITE_API_BASE_URL`. See [frontend/README.md](frontend/README.md). |
+| `VITE_API_BASE_URL` | frontend (build-time) | Full backend URL (e.g. `http://localhost:5005`). Only consulted when `VITE_DEBUG != 0`. |
+
+## Documentation map
+
+Start with the glossary, then drill into whichever layer you're working on.
+
+- [glossary.md](glossary.md) — Vietnamese ↔ English field/term reference. Read this first.
+- **Backend**
+  - [backend/README.md](backend/README.md) — server bootstrap, middleware, folder map
+  - [backend/auth.md](backend/auth.md) — JWT flow, role enforcement, sliding token refresh
+  - [backend/excel.md](backend/excel.md) — bulk import/export pipeline
+  - [backend/scripts.md](backend/scripts.md) — `register.js`, `remove_dupes.js`
+  - [backend/schemas/](backend/schemas/) — one file per Mongoose model
+- **API**
+  - [api/README.md](api/README.md) — conventions, auth header format, error shape, role matrix
+  - [api/endpoints/](api/endpoints/) — endpoints grouped by domain (auth, users, lookup, students, schools, inventory, transactions)
+- **Frontend**
+  - [frontend/README.md](frontend/README.md) — stack, dev commands, env vars, what's template boilerplate
+  - [frontend/architecture.md](frontend/architecture.md) — routing, auth, axios, state
+  - [frontend/components/](frontend/components/) — views and composables, by area
+
+## Known gotchas
+
+A few things will surprise a new contributor; each is called out in the relevant doc:
+
+1. **Empty `models/Transaction.js`** — endpoints under `/api/admin/transactions/*` operate on the `Action` model, not `Transaction`. The empty file is dead code.
+2. **`backend/config.json`** — references a hardcoded Windows path. Not loaded by the server. Dead config.
+3. **No `Bearer ` on requests, but `Bearer ` on refresh response** — see [backend/auth.md](backend/auth.md). The frontend handles the asymmetry by stripping `Bearer ` before storing the refreshed token.
+4. **`VITE_DEBUG=0` means production-style same-origin proxy**, not "debug off." The flag is misnamed.
+5. **Two parallel APIs for inventory and transactions** — the legacy `POST /insert_inventory` / `POST /insert_action` (bulk, accepts arrays) and the REST-style `POST/PUT/DELETE /inventory/:id` / `/transactions/:id` (single records) coexist. Both are used by the frontend.
+6. **`filter_inventory` and `filter_actions` field lists don't match their schemas** — see [api/endpoints/inventory.md](api/endpoints/inventory.md) and [api/endpoints/transactions.md](api/endpoints/transactions.md). These endpoints look like leftovers from an earlier data model.
+
+## Status
+
+Documentation is actively maintained alongside development.
