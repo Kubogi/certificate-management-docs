@@ -7,24 +7,6 @@ A certificate management system for an educational institution. The system track
 Full write-up on building this as a solo Year 1 student:
 [Does vibe coding actually work?](https://kubogi.github.io/2025/12/28/vibe-coding.html)
 
-The application has two faces:
-
-- **Public lookup** (`/lookup`) — anyone can search a certificate by school + student ID, or by full name + date of birth. No login required.
-- **Admin dashboard** (`/admin/*`) — staff manage students, schools, certificate inventory, and users. Login required, with three roles (`admin`, `manager`, `viewer`).
-
-## Repo layout
-
-```
-student-lookup/
-├── backend/         # Express 5 + MongoDB (Mongoose) API server
-├── frontend/        # Vue 3 + Vue Router + PrimeVue SPA (Sakai template)
-├── docs/            # This documentation tree
-├── .env             # Shared env config (loaded by both server + register/dedupe scripts)
-└── example.env      # Template for .env
-```
-
-The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. There is also a top-level `package.json` that holds a duplicate set of backend dependencies; it is unused by the running server but installed by mistake. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
-
 ## System Architecture
 
 This project is architected to separate public-facing verification from internal administrative workflows. The full technical breakdown can be found in [architecture.md](architecture.md).
@@ -64,6 +46,19 @@ All env vars live in a single `.env` at the repo root. `backend/server.js` loads
 | `PORT` | backend | Server port (defaults to whatever you set; common: `5005`). |
 | `VITE_DEBUG` | frontend (build-time) | `0` ⇒ axios uses same-origin (empty base URL); any other value ⇒ uses `VITE_API_BASE_URL`. See [frontend/README.md](frontend/README.md). |
 | `VITE_API_BASE_URL` | frontend (build-time) | Full backend URL (e.g. `http://localhost:5005`). Only consulted when `VITE_DEBUG != 0`. |
+
+## Repo layout
+
+```
+student-lookup/
+├── backend/         # Express 5 + MongoDB (Mongoose) API server
+├── frontend/        # Vue 3 + Vue Router + PrimeVue SPA (Sakai template)
+├── docs/            # This documentation tree
+├── .env             # Shared env config (loaded by both server + register/dedupe scripts)
+└── example.env      # Template for .env
+```
+
+The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. There is also a top-level `package.json` that holds a duplicate set of backend dependencies; it is unused by the running server but installed by mistake. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
 
 ## Documentation map
 
