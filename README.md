@@ -25,62 +25,21 @@ student-lookup/
 
 The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. There is also a top-level `package.json` that holds a duplicate set of backend dependencies; it is unused by the running server but installed by mistake. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
 
-## Quickstart
+## System Architecture
 
-### Prerequisites
+This project is architected to separate public-facing verification from internal administrative workflows. The full technical breakdown can be found in [architecture.md](architecture.md).
 
-- Node.js (no version is pinned; tested with 18+)
-- A MongoDB connection string
+### Conceptual Overview
+The application is a small two-faced certificate-management system/
 
-### First-time setup
+- A **public certificate lookup** at `/lookup` that anyone can use without
+  logging in.
+- An **admin dashboard** at `/admin/*` for staff to manage students, schools,
+  certificate inventory, transactions, and user accounts.
 
-```sh
-# Backend deps
-cd backend
-npm install
-
-# Frontend deps
-cd ../frontend
-npm install
-
-# Configure environment
-cd ..
-cp example.env .env
-# Edit .env — see "Environment" below
-```
-
-### Run in development
-
-Two terminals:
-
-```sh
-# Terminal 1 — API server (port 5005 by default)
-node backend/server.js
-
-# Terminal 2 — Vite dev server (port 5173 by default)
-npm --prefix frontend run dev
-```
-
-Open http://localhost:5173/lookup for the public page or http://localhost:5173/auth/login for admin.
-
-### Build for production
-
-```sh
-npm --prefix frontend run build   # → frontend/dist/
-node backend/server.js            # serve the API
-```
-
-The frontend is deployed to Vercel — see [frontend/vercel.json](../frontend/vercel.json), which rewrites all paths to `index.html` so client-side routing works on hard refresh. There is no Dockerfile, no CI, and no test suite.
-
-### Create the first admin user
-
-There is no self-serve registration. Use the CLI script:
-
-```sh
-node backend/register.js <username> <password> admin
-```
-
-See [backend/scripts.md](backend/scripts.md) for details.
+It is a single-tenant, single-process system. There are no background workers,
+no message queues, no caches, no search indexes, no microservices. Every
+operation is request-driven and synchronous.
 
 ## Environment
 
@@ -100,6 +59,7 @@ All env vars live in a single `.env` at the repo root. `backend/server.js` loads
 Start with the glossary, then drill into whichever layer you're working on.
 
 - [glossary.md](glossary.md) — Vietnamese ↔ English field/term reference. Read this first.
+- [architecture.md](architecture.md) — system-level architecture: components, request lifecycles, deployment topology, and key design decisions
 - **Backend**
   - [backend/README.md](backend/README.md) — server bootstrap, middleware, folder map
   - [backend/auth.md](backend/auth.md) — JWT flow, role enforcement, sliding token refresh
