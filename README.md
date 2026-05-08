@@ -29,8 +29,19 @@ The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each ha
 
 This project is architected to separate public-facing verification from internal administrative workflows. The full technical breakdown can be found in [architecture.md](architecture.md).
 
+```text
+Public Users ──► Vue SPA (/lookup)
+                         │
+Admin Staff ──► Vue SPA (/admin/*)
+                         │
+                         ▼
+                  Express 5 API
+                         ▼
+                     MongoDB
+```
+
 ### Conceptual Overview
-The application is a small two-faced certificate-management system/
+The application is a small two-faced certificate-management system:
 
 - A **public certificate lookup** at `/lookup` that anyone can use without
   logging in.
