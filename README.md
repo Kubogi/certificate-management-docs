@@ -1,18 +1,26 @@
 # Certificate Management System - Documentation
 
-A certificate management system for an educational institution. The system tracks student records and physical certificates issued to graduating students from partner training units. The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy.
+A certificate management system for educational institutions that tracks students, graduation certificates, issuing schools, and verification records. 
+
+The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy. The system is currently deployed and used in production by a partner institution.
 
 **This repository contains documentation only. The codebase is closed source.**
 
 Full write-up on building this as a solo Year 1 student:
 [Does vibe coding actually work?](https://kubogi.github.io/2025/12/28/vibe-coding.html)
 
+## Admin Dashboard
+
+![Admin dashboard](admin-dashboard.png)
+
+*Admin dashboard used by staff to manage certificate records, student data, partner institutions, inventory tracking, and bulk Excel imports.*
+
 ## System Architecture
 
 This project is architected to separate public-facing verification from internal administrative workflows. The full technical breakdown can be found in [architecture.md](architecture.md).
 
 ### Conceptual Overview
-The application is a small two-faced certificate-management system:
+The application is a small dual-interface certificate management system:
 
 - A **public certificate lookup** at `/lookup` that anyone can use without
   logging in.
