@@ -17,11 +17,19 @@ Some design choices were deliberate (role re-fetch, no state library, String dat
 Full write-up:
 [Does vibe coding actually work?](https://kubogi.github.io/2025/12/28/vibe-coding.html)
 
-## Admin Dashboard
+## Screenshots
+
+### Admin dashboard
 
 ![Admin dashboard](admin-dashboard.png)
 
 *Admin dashboard used by staff to manage certificate records, student data, partner institutions, inventory tracking, and bulk Excel imports.*
+
+### Public Lookup
+
+![Lookup page](lookup.png)
+
+*Used by students to look up their certificates by training institution and student ID, without logging in.*
 
 ## System Architecture
 
@@ -87,6 +95,8 @@ All env vars live in a single `.env` at the repo root. `backend/server.js` loads
 
 ## Repo layout
 
+*Layout describes the source repo, not this documentation repo.*
+
 ```
 student-lookup/
 ├── backend/         # Express 5 + MongoDB (Mongoose) API server
@@ -120,14 +130,10 @@ Start with the glossary, then drill into whichever layer you're working on.
 
 ## Known gotchas
 
-A few things will surprise a new contributor; each is called out in the relevant doc:
+A few things will surprise a new contributor:
 
 1. **Empty `models/Transaction.js`** — endpoints under `/api/admin/transactions/*` operate on the `Action` model, not `Transaction`. The empty file is dead code.
 2. **`backend/config.json`** — references a hardcoded Windows path. Not loaded by the server. Dead config.
 3. **No `Bearer ` on requests, but `Bearer ` on refresh response** — see [Key design decisions](architecture.md#key-design-decisions) and [backend/auth.md](backend/auth.md).
 4. **Two parallel APIs for inventory and transactions** — legacy bulk endpoints and REST-style single-record endpoints coexist; both are used by the frontend. See [Key design decisions](architecture.md#key-design-decisions).
 5. **`filter_inventory` and `filter_actions` field lists don't match their schemas** — see [api/endpoints/inventory.md](api/endpoints/inventory.md) and [api/endpoints/transactions.md](api/endpoints/transactions.md).
-
-## Status
-
-Documentation is actively maintained alongside development.
