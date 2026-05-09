@@ -17,7 +17,7 @@ operational details.
 
 ## Background
 
-Built solo while in grade 12. This was my first production-scale full-stack system, and many core components (authentication, role enforcement, token refresh, and bulk Excel processing) were designed from first principles before I had exposure to standard industry implementations. The system has been in production across 25+ institutions since June 2025, without a rewrite.
+Built solo while in grade 12, this was my first production-scale full-stack system. Many core components (authentication, role enforcement, token refresh, and bulk Excel processing) were designed from first principles before I had significant exposure to common production patterns. The system has remained in production across 25+ institutions since June 2025, without a rewrite.
 
 Some design choices were deliberate (role re-fetch, no state library, String dates); others are load-bearing accidents (the missing Bearer prefix, localStorage tokens). Full breakdown in [architecture.md](architecture.md).
 
@@ -112,7 +112,7 @@ student-lookup/
 └── example.env      # Template for .env
 ```
 
-The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. There is also a top-level `package.json` that holds a duplicate set of backend dependencies; it is unused by the running server but installed by mistake. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
+The repo is **not** a workspaces monorepo — `backend/` and `frontend/` each have their own `package.json` and `node_modules`. A top-level `package.json` also exists but is not used by the running application. Treat the workspace-level dependencies in `backend/package.json` as authoritative.
 
 ## Documentation map
 
@@ -138,8 +138,8 @@ Start with the glossary, then drill into whichever layer you're working on.
 
 A few things will surprise a new contributor:
 
-1. **Empty `models/Transaction.js`** — endpoints under `/api/admin/transactions/*` operate on the `Action` model, not `Transaction`. The empty file is dead code.
-2. **`backend/config.json`** — references a hardcoded Windows path. Not loaded by the server. Dead config.
+1. **Empty `models/Transaction.js`** — endpoints under `/api/admin/transactions/*` operate on the `Action` model, not `Transaction`. The empty file is retained for legacy compatibility/history.
+2. **`backend/config.json`** — references a hardcoded Windows path. Not loaded by the server. Unused legacy configuration file.
 3. **No `Bearer ` on requests, but `Bearer ` on refresh response** — see [Key design decisions](architecture.md#key-design-decisions) and [backend/auth.md](backend/auth.md).
 4. **Two parallel APIs for inventory and transactions** — legacy bulk endpoints and REST-style single-record endpoints coexist; both are used by the frontend. See [Key design decisions](architecture.md#key-design-decisions).
 5. **`filter_inventory` and `filter_actions` field lists don't match their schemas** — see [api/endpoints/inventory.md](api/endpoints/inventory.md) and [api/endpoints/transactions.md](api/endpoints/transactions.md).
