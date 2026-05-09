@@ -1,21 +1,27 @@
 # Certificate Management System - Documentation
 
-A certificate management system for educational institutions that tracks students, graduation certificates, issuing schools, and verification records. 
+A certificate management system for educational institutions that tracks students, graduation certificates, issuing schools, and verification records.
+
+Since launch in June 2025, the system has:
+- served 25+ institutions,
+- processed 120k+ certificate records,
+- supported thousands of public verification lookups,
+- operated continuously without a rewrite.
 
 The platform was developed to improve student access to certificate records for partner institutions. Previously, students had to retrieve or verify records directly through the institution’s administrative office. The online lookup system allows certificate information to be accessed instantly and remotely.
 
-The production deployment runs on a single VPS hosting the frontend, backend API, and MongoDB instance behind an Nginx reverse proxy. The system is currently deployed and used in production by 25+ educational institutions.
+Deployed on a single VPS running the frontend, Express API, and MongoDB behind Nginx.
 
-**This repository contains documentation only. The codebase is closed source.**
+**This repository contains documentation only. The codebase is closed source.** The production codebase contains institution-specific logic and
+operational details.
 
 ## Background
 
-Built solo as a grade 12 student. This was my first production-scale full-stack project, and most of the system (auth, role enforcement, the sliding token refresh, the bulk Excel pipeline) was derived from first principles before I'd seen the conventional patterns. The system has been running in production across 25+ institutions since June 2025, without a rewrite.
+Built solo while in grade 12. This was my first production-scale full-stack system, and many core components (authentication, role enforcement, token refresh, and bulk Excel processing) were designed from first principles before I had exposure to standard industry implementations. The system has been in production across 25+ institutions since June 2025, without a rewrite.
 
 Some design choices were deliberate (role re-fetch, no state library, String dates); others are load-bearing accidents (the missing Bearer prefix, localStorage tokens). Full breakdown in [architecture.md](architecture.md).
 
-Full write-up:
-[Does vibe coding actually work?](https://kubogi.github.io/2025/12/28/vibe-coding.html)
+Full write-up [here](https://kubogi.github.io/2025/12/28/vibe-coding.html).
 
 ## Screenshots
 
