@@ -10,7 +10,7 @@ The production deployment runs on a single VPS hosting the frontend, backend API
 
 ## Background
 
-Built solo as a Year 1 student. This was my first production-scale full-stack project, and most of the system (auth, role enforcement, the sliding token refresh, the bulk Excel pipeline) was derived from first principles before I'd seen the conventional patterns. The system has been running in production across 25+ institutions since June 2025, without a rewrite.
+Built solo as a grade 12 student. This was my first production-scale full-stack project, and most of the system (auth, role enforcement, the sliding token refresh, the bulk Excel pipeline) was derived from first principles before I'd seen the conventional patterns. The system has been running in production across 25+ institutions since June 2025, without a rewrite.
 
 Some design choices were deliberate (role re-fetch, no state library, String dates); others are load-bearing accidents (the missing Bearer prefix, localStorage tokens). Full breakdown in [architecture.md](architecture.md).
 
