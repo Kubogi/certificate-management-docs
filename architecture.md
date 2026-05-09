@@ -31,17 +31,18 @@ operation is request-driven and synchronous.
              │  HTTPS (no auth)                   │  HTTPS + JWT
              ▼                                    ▼
        ┌─────────────────────────────────────────────────┐
-       │  Frontend SPA (Vue 3 + PrimeVue, served static) │
-       │  Hosted on Vercel; vercel.json rewrites all     │
-       │  paths to /index.html for client-side routing.  │
+       │  Frontend SPA (Vue 3 + PrimeVue)                │
+       │  Built to frontend/dist/ and served as static   │
+       │  files by Nginx on the production VPS.          │
        └────────────────────────┬────────────────────────┘
                                 │
-                                │  axios → /api/*
+                                │  axios → /api/* (Nginx proxies to backend)
                                 ▼
        ┌─────────────────────────────────────────────────┐
        │  Backend API (Express 5 + Mongoose 8)           │
-       │  Single Node process. Listens on $PORT,         │
-       │  binds 0.0.0.0. No reverse proxy in repo.       │
+       │  Single Node process under PM2. Listens on      │
+       │  $PORT (typically bound to localhost in         │
+       │  production and reverse-proxied by Nginx).      │
        │                                                 │
        │  /api/auth/*    auth_routes                     │
        │  /api/admin/*   admin_routes (auth required)    │
@@ -51,8 +52,8 @@ operation is request-driven and synchronous.
                                 │  mongoose.connect($URI)
                                 ▼
                        ┌─────────────────┐
-                       │  MongoDB Atlas  │
-                       │  (or any Mongo) │
+                       │  MongoDB        │
+                       │  (self-hosted)  │
                        └─────────────────┘
 ```
 
@@ -264,33 +265,35 @@ Per-endpoint role matrix: [api/README.md](api/README.md).
 
 ### Frontend
 
-Built with `npm --prefix frontend run build` to `frontend/dist/`. The folder
-is deployed to Vercel; [frontend/vercel.json](../frontend/vercel.json)
-contains a single SPA-rewrite rule (`/(.*)` → `/`) so hard refreshes on
-`/admin/*` paths still load `index.html` and let the router take over.
+Built with `npm --prefix frontend run build` to `frontend/dist/`. In
+production, Nginx serves the contents of `dist/` as static files and
+includes a `try_files $uri $uri/ /index.html;` rule (or equivalent) so
+hard refreshes on `/admin/*` paths still load `index.html` and let the
+client-side router take over.
+
+`frontend/vercel.json` is Sakai-template residue and is not used by the
+deployment. See [frontend/README.md](frontend/README.md#what-to-ignore).
 
 The frontend talks to the backend in one of two modes, selected at build time:
 
 | `VITE_DEBUG` | `api_base_url` resolves to | Use case |
 |---|---|---|
-| `0` | `''` (empty — same-origin) | Production, where a reverse proxy or rewrite forwards `/api/*` to the backend |
+| `0` | `''` (empty — same-origin) | Production: Nginx proxies `/api/*` from the same origin to the backend |
 | any other value | `import.meta.env.VITE_API_BASE_URL` | Local dev (e.g. `http://localhost:5005`), or any deployment where the API lives on a different origin |
-
-Note: the `vercel.json` in the repo only rewrites for SPA routing — it does
-**not** include an `/api/*` proxy rule. Production with `VITE_DEBUG=0`
-therefore needs that rule added to Vercel, or a separate edge proxy.
 
 ### Backend
 
-`node backend/server.js` from a host of your choice. There is no Dockerfile,
-no process supervisor, and no CI in the repo. Environment variables (`URI`,
+`node backend/server.js`. In production this runs under PM2 on the same VPS
+as Nginx and MongoDB; PM2 handles restart-on-crash and boot. There is no
+Dockerfile and no CI in the repo. Environment variables (`URI`,
 `JWT_SECRET`, `CORS_ORIGIN`, `PORT`) come from `.env` at the repo root, which
 the server loads via `dotenv.config({ path: '../.env' })`.
 
 ### Database
 
-Any MongoDB cluster reachable by the backend host. The connection string is
-the only DB-level config; collections are created lazily on first write.
+MongoDB, self-hosted on the same VPS as the API server (the backend connects
+to it on localhost). The connection string in `URI` is the only DB-level
+config; collections are created lazily on first write.
 
 ---
 

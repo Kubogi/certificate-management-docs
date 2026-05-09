@@ -194,4 +194,4 @@ Everything else is component-local: `ref()`, `reactive()`, `computed()`. Cross-c
 - `assets/<chunk>.js`, `<chunk>.css` — code-split per route plus a vendor chunk
 - Static assets
 
-Deployed to Vercel ([frontend/vercel.json](../../frontend/vercel.json)). The single rewrite `{ "source": "/(.*)", "destination": "/" }` ensures hard refreshes on `/admin/*` paths still load `index.html` so the SPA router takes over.
+Served as static files by Nginx on the production VPS, with a `try_files … /index.html;` rule so hard refreshes on `/admin/*` paths still load `index.html` and let the SPA router take over. The `frontend/vercel.json` file is leftover from the Sakai template and is not used in production — see [README.md](README.md#what-to-ignore).

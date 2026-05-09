@@ -127,6 +127,7 @@ The Sakai template ships with a lot of demo content. The following are **not use
 - [views/Dashboard.vue](../../frontend/src/views/Dashboard.vue) — defined but never added to the router.
 - The flat `layout/AppLayout.vue` (and siblings) at the top of `layout/` — the *real* shells live in `layout/admin/` and `layout/lookup/`. The flat versions appear to be the original Sakai shell, replaced by the per-area variants when this app forked.
 - [views/pages/Error.vue](../../frontend/src/views/pages/Error.vue) and [views/pages/Access.vue](../../frontend/src/views/pages/Access.vue) — neither is routed. The router's catch-all redirects to `/auth/login` or `/admin/dashboard_students` instead.
+- [frontend/vercel.json](../../frontend/vercel.json) — Sakai-template SPA-rewrite config for Vercel hosting. Production deploys via Nginx on a VPS (see [../README.md](../README.md#deployment--infrastructure)), so this file is not part of the deployment path.
 
 If you find yourself reading any of these to understand a feature, you've gone too far down. Stop.
 
